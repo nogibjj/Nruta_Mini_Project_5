@@ -3,6 +3,7 @@ import os
 import sqlite3
 from mylib.transform_load import load
 from mylib.query import (
+    create_table,
     create_biopic,
     read_biopics,
     update_biopic,
@@ -16,7 +17,8 @@ class TestDatabaseOperations(unittest.TestCase):
         """Set up the test database and load sample data."""
         # Create a temporary SQLite database for testing
         cls.db_name = "test_biopics.db"
-        cls.file_path = "data/test_biopics.csv"
+        create_table(cls.db_name)
+        cls.file_path = "data/biopics.csv"
 
         # Create a mock file with all 14 columns
         with open(cls.file_path, "w", encoding="utf-8") as f:
@@ -151,7 +153,7 @@ class TestDatabaseOperations(unittest.TestCase):
             "Delete Actor",
         )
 
-        delete_biopic(self.db_name)  # Delete by title
+        delete_biopic(self.db_name, "Delete Title")
 
         # Verify the deletion
         biopics_after_delete = [

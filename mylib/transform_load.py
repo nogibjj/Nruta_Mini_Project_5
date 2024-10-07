@@ -14,13 +14,13 @@ def load(dataset="data/biopics.csv"):
         print("CSV Contents:", payload)  # Debugging: print to check CSV contents
 
     # Connect to the SQLite database
-    conn = sqlite3.connect("Biopics.db")
+    conn = sqlite3.connect("biopics.db")
     c = conn.cursor()
 
     # Drop the table if it exists, and recreate it
-    c.execute("DROP TABLE IF EXISTS Biopics")
+    c.execute("DROP TABLE IF EXISTS biopics")
     c.execute(
-        """CREATE TABLE Biopics (
+        """CREATE TABLE biopics (
             title TEXT, 
             site TEXT, 
             country TEXT, 
@@ -40,7 +40,7 @@ def load(dataset="data/biopics.csv"):
 
     # Skip the header (first row) if necessary
     c.executemany(
-        "INSERT INTO Biopics (title, site, country, year_release, box_office, director, number_of_subjects, subject, type_of_subject, race_known, subject_race, person_of_color, subject_sex, lead_actor_actress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO biopics (title, site, country, year_release, box_office, director, number_of_subjects, subject, type_of_subject, race_known, subject_race, person_of_color, subject_sex, lead_actor_actress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         payload[1:],
     )
 

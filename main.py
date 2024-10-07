@@ -72,7 +72,7 @@ def main():
         print(biopic)
 
     print("\nDeleting Back to Black biopic...")
-    delete_biopic("Back to Black")
+    delete_biopic("biopics.db", "Back to Black")
 
     # final read to verify changes
     final_biopics = read_biopics("Biopics")
