@@ -7,7 +7,7 @@ import csv
 import os
 
 
-def load(dataset="data/biopics.csv"):
+def load(dataset="biopics.csv"):
     # Open the file with encoding and error handling to avoid UnicodeDecodeError
     with open(dataset, newline="", encoding="utf-8", errors="replace") as f:
         payload = list(csv.reader(f, delimiter=","))  # Read the whole file at once
