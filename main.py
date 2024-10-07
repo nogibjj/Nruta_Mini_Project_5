@@ -1,5 +1,10 @@
 from mylib.extract import extract
-from mylib.query import query
+from mylib.query import (
+    create_biopic,
+    read_biopics,
+    update_biopic,
+    delete_biopic,
+)
 from mylib.transform_load import load
 
 
@@ -12,53 +17,66 @@ def main():
 
     # performing CRUD operations
     # Create a new biopic record
-    query.create_biopic(
+    create_biopic(
+        "Biopics",
         "Back to Black",
-        "New Site",
+        "https://www.imdb.com/title/tt21261712/",
         "United Kingdom",
         2024,
         "$50.8",
         "Sam Taylor-Johnson",
+        1,
+        "Amy Winehouse",
+        "Musician",
+        "Yes",
+        "White",
+        "No",
+        "Female",
+        "Marisa Abela",
     )
 
     # Read and display all biopic records
-    biopics = query.read_biopics()
+    biopics = read_biopics("Biopics")
     print("All Biopics:")
     for biopic in biopics:
         print(biopic)
 
     # Display updated list of biopics
-    updated_biopics = query.read_biopics()
+    updated_biopics = read_biopics("Biopics")
     print("\nUpdated Biopics after Insertion:")
     for biopic in updated_biopics:
         print(biopic)
 
-    # Assuming you want to update and delete an existing biopic:
-    # Get the first biopic ID for demonstration (make sure at least one record exists)
-    if updated_biopics:
-        biopic_id = updated_biopics[0][
-            0
-        ]  # This assumes the ID is the first column in the fetched results
-        print(f"\nUpdating Biopic ID: {biopic_id}")
-        query.update_biopic(
-            biopic_id,
-            "Updated Biopic Title",
-            "Updated Site",
-            "Updated Country",
-            2024,
-            "2000000",
-            "Updated Director",
-        )
+    print("\nUpdating the Back to Black biopic...")
+    update_biopic(
+        "Biopics",
+        "Updated Biopic Title",
+        "Updated Site",
+        "Updated Country",
+        2024,
+        "Updated box office",
+        "Updated Director",
+        "Updated no. of subjects",
+        "Updated Subject",
+        "Updated Type of Subject",
+        "Updated Race Known",
+        "Updated Subject Race",
+        "Updated Person of Color",
+        "Updated Subject Sex",
+        "Updated Lead Actor/Actress",
+    )
 
-        # Delete the newly created biopic record (assuming you want to delete the last entry)
-        print(
-            f"\nDeleting Biopic ID: {updated_biopics[-1][0]}"
-        )  # Deletes the last biopic
-        query.delete_biopic(updated_biopics[-1][0])
+    updated_biopics = read_biopics("Biopics")
+    print("\nUpdated biopics after insertion and update:")
+    for biopic in updated_biopics():
+        print(biopic)
 
-    # Final read to verify changes
-    final_biopics = query.read_biopics()
-    print("\nFinal Biopics after Update and Delete:")
+    print("\nDeleting Back to Black biopic...")
+    delete_biopic("Back to Black")
+
+    # final read to verify changes
+    final_biopics = read_biopics("Biopics")
+    print("\nFinal Biopics after deletion:")
     for biopic in final_biopics:
         print(biopic)
 

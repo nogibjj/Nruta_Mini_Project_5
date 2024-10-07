@@ -1,9 +1,13 @@
 import unittest
 import os
 import sqlite3
-from mylib.extract import extract
 from mylib.transform_load import load
-from mylib.query import query
+from mylib.query import (
+    create_biopic,
+    read_biopics,
+    update_biopic,
+    delete_biopic,
+)
 
 
 class TestDatabaseOperations(unittest.TestCase):
@@ -14,12 +18,19 @@ class TestDatabaseOperations(unittest.TestCase):
         cls.db_name = "test_biopics.db"
         cls.file_path = "data/test_biopics.csv"
 
-        # Extract sample data (can create a mock file for testing)
-        extract(
-            url="https://github.com/fivethirtyeight/data/raw/refs/heads/master/biopics/biopics.csv",
-            file_path=cls.file_path,
-        )
-        load(cls.file_path)  # Load data into the actual test database
+        # Create a mock file with all 14 columns
+        with open(cls.file_path, "w", encoding="utf-8") as f:
+            f.write(
+                "Title,Site,Country,Year,Budget,Director,Number of Subjects,Subject,"
+                "Type of Subject,Race Known,Subject Race,Person of Color,Subject Sex,Lead Actor\n"
+            )
+            f.write(
+                "Test Movie,Test Site,Test Country,2024,100000,Test Director,1,"
+                "Test Subject,Test Type,Yes,Test Race,No,Female,Test Actor\n"
+            )
+
+        # Load data into the test database
+        load(cls.file_path)  # Ensure loading into the test DB
         cls.conn = sqlite3.connect(cls.db_name)
         cls.cursor = cls.conn.cursor()
 
@@ -28,13 +39,28 @@ class TestDatabaseOperations(unittest.TestCase):
         """Clean up the test database."""
         cls.conn.close()
         os.remove(cls.db_name)
+        os.remove(cls.file_path)
 
     def test_create_biopic(self):
-        """Test creating a new biopic record."""
-        query.create_biopic(
-            "Test Title", "Test Site", "Test Country", 2023, "500000", "Test Director"
+        """Test creating a new biopic record with all 14 columns."""
+        create_biopic(
+            self.db_name,
+            "Test Title",
+            "Test Site",
+            "Test Country",
+            2023,
+            "500000",
+            "Test Director",
+            2,
+            "Test Subject",
+            "Test Type",
+            "Yes",
+            "Test Race",
+            "No",
+            "Female",
+            "Test Actor",
         )
-        biopics = query.read_biops()
+        biopics = read_biopics(self.db_name)  # Pass the db_name
         self.assertIn(
             (
                 "Test Title",
@@ -43,57 +69,95 @@ class TestDatabaseOperations(unittest.TestCase):
                 2023,
                 "500000",
                 "Test Director",
+                2,
+                "Test Subject",
+                "Test Type",
+                "Yes",
+                "Test Race",
+                "No",
+                "Female",
+                "Test Actor",
             ),
             biopics,
         )
 
     def test_read_biopics(self):
         """Test reading biopics."""
-        biopics = query.read_biopics()
+        biopics = read_biopics(self.db_name)  # Pass the db_name
         self.assertGreater(len(biopics), 0)  # Ensure there are records
 
     def test_update_biopic(self):
-        """Test updating an existing biopic."""
+        """Test updating an existing biopic with all 14 columns."""
         # Create a biopic to update
-        query.create_biopic(
-            "Old Title", "Old Site", "Old Country", 2022, "300000", "Old Director"
+        create_biopic(
+            self.db_name,
+            "Old Title",
+            "Old Site",
+            "Old Country",
+            2022,
+            "300000",
+            "Old Director",
+            1,
+            "Old Subject",
+            "Old Type",
+            "Yes",
+            "Old Race",
+            "No",
+            "Male",
+            "Old Actor",
         )
-        # Read and get the ID of the new biopic
-        biopics = query.read_biopics()
-        biopic_id = biopics[-1][0]  # Get the ID of the last biopic
-        query.update_biopic(
-            biopic_id,
-            "Updated Title",
+
+        # Update biopic
+        update_biopic(
+            self.db_name,
+            "Old Title",
             "Updated Site",
             "Updated Country",
             2023,
             "600000",
             "Updated Director",
+            1,
+            "Updated Subject",
+            "Updated Type",
+            "No",
+            "Updated Race",
+            "Yes",
+            "Female",
+            "Updated Actor",
         )
 
         # Verify the update
-        updated_biopic = query.read_biopics()[-1]  # Get the last biopic
-        self.assertEqual(updated_biopic[1], "Updated Title")
+        updated_biopic = [b for b in read_biopics(self.db_name) if b[0] == "Old Title"]
+        self.assertEqual(updated_biopic[0][1], "Updated Site")
+        self.assertEqual(updated_biopic[0][8], "Updated Type")
 
     def test_delete_biopic(self):
         """Test deleting a biopic."""
-        query.create_biopic(
+        create_biopic(
+            self.db_name,
             "Delete Title",
             "Delete Site",
             "Delete Country",
             2023,
             "100000",
             "Delete Director",
+            1,
+            "Delete Subject",
+            "Delete Type",
+            "Yes",
+            "Delete Race",
+            "No",
+            "Male",
+            "Delete Actor",
         )
-        biopics = query.read_biopics()
-        biopic_id = biopics[-1][0]  # Get the ID of the last biopic
-        query.delete_biopic(biopic_id)
+
+        delete_biopic(self.db_name)  # Delete by title
 
         # Verify the deletion
-        biopics_after_delete = query.read_biopics()
-        self.assertNotIn(
-            biopic_id, [b[0] for b in biopics_after_delete]
-        )  # Check ID is not present
+        biopics_after_delete = [
+            b for b in read_biopics(self.db_name) if b[0] == "Delete Title"
+        ]
+        self.assertEqual(len(biopics_after_delete), 0)  # Ensure it's gone
 
 
 if __name__ == "__main__":

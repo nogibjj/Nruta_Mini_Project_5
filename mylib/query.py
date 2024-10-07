@@ -1,23 +1,83 @@
 import sqlite3
 
 
+# Update connection function to accept db_name
 def connect_db(db_name):
     return sqlite3.connect(db_name)
 
 
-def create_biopic(title, site, country, year_release, box_office, director):
-    conn = connect_db()
+def create_table(db_name):
+    conn = connect_db(db_name)
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO Biopics (title, site, country, year_release, box_office, director) VALUES (?, ?, ?, ?, ?, ?)",
-        (title, site, country, year_release, box_office, director),
+        """CREATE TABLE IF NOT EXISTS Biopics (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,  -- Include an ID if necessary
+            title TEXT, 
+            site TEXT, 
+            country TEXT, 
+            year_release INTEGER, 
+            box_office TEXT, 
+            director TEXT,
+            number_of_subjects INTEGER,
+            subject TEXT,
+            type_of_subject TEXT,
+            race_known TEXT,
+            subject_race TEXT,
+            person_of_color TEXT,
+            subject_sex TEXT,
+            lead_actor_actress TEXT
+        )"""
     )
     conn.commit()
     conn.close()
 
 
-def read_biopics():
-    conn = connect_db()
+# Insert a new biopic
+def create_biopic(
+    db_name,  # Add db_name here
+    title,
+    site,
+    country,
+    year_release,
+    box_office,
+    director,
+    number_of_subjects,
+    subject,
+    type_of_subject,
+    race_known,
+    subject_race,
+    person_of_color,
+    subject_sex,
+    lead_actor_actress,
+):
+    conn = connect_db(db_name)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO Biopics (title, site, country, year_release, box_office, director, number_of_subjects, subject, type_of_subject, race_known, subject_race, person_of_color, subject_sex, lead_actor_actress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            title,
+            site,
+            country,
+            year_release,
+            box_office,
+            director,
+            number_of_subjects,
+            subject,
+            type_of_subject,
+            race_known,
+            subject_race,
+            person_of_color,
+            subject_sex,
+            lead_actor_actress,
+        ),
+    )
+    conn.commit()
+    conn.close()
+
+
+# Read all biopics
+def read_biopics(db_name):  # Added db_name
+    conn = connect_db(db_name)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Biopics")
     results = cursor.fetchall()
@@ -25,20 +85,53 @@ def read_biopics():
     return results
 
 
-def update_biopic(title, site, country, year_release, box_office, director):
-    conn = connect_db()
+# Update biopic
+def update_biopic(
+    db_name,
+    title,
+    site,
+    country,
+    year_release,
+    box_office,
+    director,
+    number_of_subjects,
+    subject,
+    type_of_subject,
+    race_known,
+    subject_race,
+    person_of_color,
+    subject_sex,
+    lead_actor_actress,
+):
+    conn = connect_db(db_name)
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE Biopics SET title = ?, site = ?, country = ?, year_release = ?, box_office = ?, director = ? WHERE id = ?",
-        (title, site, country, year_release, box_office, director, biopic_id),
+        "UPDATE Biopics SET title = ?, site = ?, country = ?, year_release = ?, box_office = ?, director = ?, number_of_subjects = ?, subject = ?, type_of_subject = ?, race_known = ?, subject_race = ?, person_of_color = ?, subject_sex = ?, lead_actor_actress = ?",
+        (
+            title,
+            site,
+            country,
+            year_release,
+            box_office,
+            director,
+            number_of_subjects,
+            subject,
+            type_of_subject,
+            race_known,
+            subject_race,
+            person_of_color,
+            subject_sex,
+            lead_actor_actress,
+        ),
     )
     conn.commit()
     conn.close()
 
 
-def delete_biopic(biopic_id):
-    conn = connect_db()
+# Delete a biopic
+def delete_biopic(db_name):  # Added db_name
+    conn = connect_db(db_name)
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM Biopics WHERE id = ?", (biopic_id,))
+    cursor.execute("DELETE FROM Biopics WHERE id = ?")
     conn.commit()
     conn.close()
