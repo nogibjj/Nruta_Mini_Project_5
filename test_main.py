@@ -18,7 +18,7 @@ class TestDatabaseOperations(unittest.TestCase):
         # Create a temporary SQLite database for testing
         cls.db_name = "test_biopics.db"
         create_table(cls.db_name)
-        cls.file_path = "data/biopics.csv"
+        cls.file_path = "biopics.csv"
 
         # Create a mock file with all 14 columns
         with open(cls.file_path, "w", encoding="utf-8") as f:
